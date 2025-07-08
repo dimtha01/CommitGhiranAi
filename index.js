@@ -128,7 +128,7 @@ const prompt =
 <tipo>: <título en español (max 50 chars, sin acentos)>
 * <viñeta 1 en infinitivo (español) - cambio principal OBLIGATORIO>
 * <viñeta 2 - cambio secundario RELEVANTE si aplica>
-* <viñeta 3 - detalle técnico IMPORTANTE si aplica>
+* <viñeta N - detalles técnicos adicionales NECESARIOS>
 
 --- TIPOS PERMITIDOS (SOLO ESTOS) ---
 feat    - Nueva funcionalidad (usar "feat" pero descripción en español)
@@ -154,41 +154,35 @@ revert  - Revertir cambios
 2. CUERPO (VIÑETAS):
    * PRIMERA VIÑETA: Cambio principal (OBLIGATORIA)
      - Verbo en infinitivo técnico (implementar, corregir, optimizar)
-     - Componente afectado
-     - Razón técnica clara
-   * SEGUNDA VIÑETA: Solo si hay cambio secundario relevante
-     - Debe complementar al principal
-     - Mismo formato técnico
-   * TERCERA VIÑETA: Solo para detalles técnicos clave
-     - Ej: "Usar algoritmo X para Y"
-     - Nunca mencionar archivos
+     - Explicar QUÉ y POR QUÉ (no solo "cambiar X")
+   * VIÑETAS ADICIONALES: 
+     - Solo si aportan contexto técnico relevante
+     - Cada una debe ser autocontenida y clara
+     - No usar viñetas redundantes o genéricas
+     - Priorizar orden lógico (ej: flujo de datos -> validación -> UI)
 
 3. PROHIBIDO:
-   - Viñetas genéricas ("actualizar codigo")
-   - Mencionar archivos directamente
-   - Mezclar tipos de cambios
-   - Exceder 3 viñetas (ser conciso)
+   - Viñetas genéricas ("actualizar código", "fix cosas")
+   - Mencionar archivos sin contexto ("modificar api.js")
+   - Mezclar tipos de cambios (ej: "fix" y "feat" juntos)
+   - Usar inglés ("bug", "hotfix", "refactor")
 
---- EJEMPLO VALIDO ---
-feat: Mejorar rendimiento en busqueda
-* Implementar indexado con Bloom filters
-* Reducir complejidad de O(n) a O(1)
-* Usar libreria XX para hashing
-
---- EJEMPLO INVALIDO ---
-fix: Arreglar cosas (ERROR: genérico)
-* Update utils.js (ERROR: archivo)
-* Fix bug (ERROR: inglés)
-* Añadir test (ERROR: cambio distinto)
+--- EJEMPLO VALIDO (CON VIÑETAS EXTENDIDAS) ---
+feat: Agregar validacion en formulario de pago
+* Implementar chequeo de tarjeta con Luhn
+* Añadir mensajes de error contextuales
+* Integrar con servicio de antifraude
+* Actualizar tests de integracion
+* Optimizar tiempo de respuesta en validacion
 
 --- CAMBIOS A DOCUMENTAR ---
 ${diff}
 
 Genera EXACTAMENTE 1 commit que:
-1. Use 1-(las nesesarias) viñetas SÓLO si son necesarias
-2. Cada viñeta sea un aspecto TÉCNICO concreto
-3. Priorice PRECISIÓN sobre cantidad
-4. Sea 100% en español técnico claro`;
+1. Use tantas viñetas como cambios técnicos relevantes haya
+2. Cada viñeta explique un aspecto CONCRETO (no agrupar)
+3. Mantenga coherencia con el tipo de commit
+4. Sea 100% en español técnico claro y preciso`;
 
   let attempts = 0;
   let title = "", body = "";
@@ -214,7 +208,7 @@ Genera EXACTAMENTE 1 commit que:
   process.exit(1);
 };
 
-const generateListCommits = async (diff, numOptions = 3) => {
+const generateListCommits = async (diff, numOptions = "N") => {
 const prompt = `Genera EXACTAMENTE ${numOptions} opciones de mensajes de commit SEMÁNTICOS en ESPAÑOL para estos cambios:
 
 --- REGLAS ESTRICTAS (ESPAÑOL OBLIGATORIO) ---
