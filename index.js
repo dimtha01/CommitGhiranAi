@@ -125,7 +125,7 @@ const generateCommit = async (diff) => {
 `Genera EXACTAMENTE 1 mensaje de commit profesional con estas REGLAS ABSOLUTAS:
 
 --- FORMATO EXACTO ---
-<tipo>: <título en español (max 50 chars, sin acentos)>|||
+<tipo>: <título en español (max 50 chars, sin acentos)>
 * <viñeta 1 en infinitivo (español)>
 * <viñeta 2 (opcional)>
 * <viñeta 3 (opcional)>
@@ -225,7 +225,7 @@ const prompt = `Genera EXACTAMENTE ${numOptions} opciones de mensajes de commit 
    • revert:   Revertir cambios
 
 2. ESTRUCTURA OBLIGATORIA:
-   <tipo>(<ámbito>): <título (50 chars max)>|||
+   <tipo>(<ámbito>): <título (50 chars max)>
    * Verbo en infinitivo (español)
    * Descripción específica (todas las viñetas necesarias)
    * Sin nombres de archivos sin contexto
@@ -239,7 +239,7 @@ const prompt = `Genera EXACTAMENTE ${numOptions} opciones de mensajes de commit 
    • Usar "código", "archivo" o términos vagos
 
 --- EJEMPLO PERFECTO ---
-feat(autenticacion): implementar login biometrico|||
+feat(autenticacion): implementar login biometrico
 * Añadir soporte para huella digital en iOS
 * Integrar API de FaceID para Apple
 * Implementar autenticacion con rostro en Android
