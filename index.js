@@ -121,14 +121,14 @@ async function callQwenAPI(prompt) {
 }
 
 const generateCommit = async (diff) => {
- const prompt =
+const prompt =
 `Genera EXACTAMENTE 1 mensaje de commit profesional con estas REGLAS ABSOLUTAS:
 
 --- FORMATO EXACTO ---
 <tipo>: <título en español (max 50 chars, sin acentos)>
-* <viñeta 1 en infinitivo (español)>
-* <viñeta 2 (opcional)>
-* <viñeta 3 (opcional)>
+* <viñeta 1 en infinitivo (español) - cambio principal OBLIGATORIO>
+* <viñeta 2 - cambio secundario RELEVANTE si aplica>
+* <viñeta 3 - detalle técnico IMPORTANTE si aplica>
 
 --- TIPOS PERMITIDOS (SOLO ESTOS) ---
 feat    - Nueva funcionalidad (usar "feat" pero descripción en español)
@@ -149,39 +149,46 @@ revert  - Revertir cambios
    - Sin acentos ni caracteres especiales
    - Maximo 50 caracteres
    - Sin puntos finales
-   - No usar "codigo", "archivo" o terminos vagos
+   - Especificar componente afectado (ej: "en modulo X")
 
-2. CUERPO:
-   - Verbos en infinitivo (añadir, corregir, implementar)
-   * Cada viñeta explica un cambio concreto
-   - Explicar QUE y POR QUE (no COMO)
-   - No mencionar nombres de archivos directamente
+2. CUERPO (VIÑETAS):
+   * PRIMERA VIÑETA: Cambio principal (OBLIGATORIA)
+     - Verbo en infinitivo técnico (implementar, corregir, optimizar)
+     - Componente afectado
+     - Razón técnica clara
+   * SEGUNDA VIÑETA: Solo si hay cambio secundario relevante
+     - Debe complementar al principal
+     - Mismo formato técnico
+   * TERCERA VIÑETA: Solo para detalles técnicos clave
+     - Ej: "Usar algoritmo X para Y"
+     - Nunca mencionar archivos
 
 3. PROHIBIDO:
-   - Terminos en inglés ("bug", "fix", "hotfix")
-   - Mensajes genericos ("actualizar cosas")
-   - Referencias a archivos sin contexto
-   - Mezclar tipos en un commit
+   - Viñetas genéricas ("actualizar codigo")
+   - Mencionar archivos directamente
+   - Mezclar tipos de cambios
+   - Exceder 3 viñetas (ser conciso)
 
 --- EJEMPLO VALIDO ---
-feat: Agregar autenticacion con Google
-* Implementar flujo OAuth 2.0
-* Añadir validacion de tokens JWT
-* Crear endpoint /auth/google
+feat: Mejorar rendimiento en busqueda
+* Implementar indexado con Bloom filters
+* Reducir complejidad de O(n) a O(1)
+* Usar libreria XX para hashing
 
 --- EJEMPLO INVALIDO ---
-fix: Solve login bug (ERROR: inglés)
-* Update auth.js (ERROR: menciona archivo)
-* Fix things (ERROR: genérico)
+fix: Arreglar cosas (ERROR: genérico)
+* Update utils.js (ERROR: archivo)
+* Fix bug (ERROR: inglés)
+* Añadir test (ERROR: cambio distinto)
 
 --- CAMBIOS A DOCUMENTAR ---
 ${diff}
 
 Genera EXACTAMENTE 1 commit que:
-1. Cumpla TODAS las reglas anteriores
-2. Sea ATOMICO (1 solo cambio logico)
-3. Use español perfectamente claro
-4. Priorice la claridad sobre la brevedad`;
+1. Use 1-(las nesesarias) viñetas SÓLO si son necesarias
+2. Cada viñeta sea un aspecto TÉCNICO concreto
+3. Priorice PRECISIÓN sobre cantidad
+4. Sea 100% en español técnico claro`;
 
   let attempts = 0;
   let title = "", body = "";
