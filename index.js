@@ -121,48 +121,67 @@ async function callQwenAPI(prompt) {
 }
 
 const generateCommit = async (diff) => {
-  const prompt =
-    `Genera un mensaje de commit profesional siguiendo ESTE FORMATO EXACTO:
+ const prompt =
+`Genera EXACTAMENTE 1 mensaje de commit profesional con estas REGLAS ABSOLUTAS:
 
-1. TÍTULO (una línea, máximo 50 caracteres):
-   "<tipo>: <descripción breve en español>"
+--- FORMATO EXACTO ---
+<tipo>: <título en español (max 50 chars, sin acentos)>|||
+* <viñeta 1 en infinitivo (español)>
+* <viñeta 2 (opcional)>
+* <viñeta 3 (opcional)>
 
-2. CUERPO (opcional pero recomendado):
-   * Lista con viñetas explicando los cambios
-   * En español claro, sin acentos
-   * Detalla qué, por qué (no cómo)
+--- TIPOS PERMITIDOS (SOLO ESTOS) ---
+feat    - Nueva funcionalidad (usar "feat" pero descripción en español)
+fix     - Correccion de errores
+docs    - Documentacion
+style   - Formato/estructura
+refactor- Reestructuracion sin cambiar funcionalidad
+perf    - Mejora de rendimiento
+test    - Pruebas
+chore   - Mantenimiento
+build   - Sistema de compilacion
+ci      - Integracion continua
+revert  - Revertir cambios
 
---- REGLAS ESTRICTAS ---
-• TIPOS VÁLIDOS (usa SOLO estos):
-  - feat:     Nueva funcionalidad
-  - fix:      Corrección de errores
-  - docs:     Cambios en documentación
-  - style:    Formato/estructura (sin afectar código)
-  - refactor: Reestructuración de código existente
-  - perf:     Mejora de rendimiento
-  - test:     Añadir/mejorar pruebas
-  - chore:    Tareas de mantenimiento (config, dependencias)
-  - build:    Cambios en sistema de compilación
-  - ci:       Cambios en CI/CD
-  - revert:   Revertir un commit anterior
+--- REGLAS DE ESCRITURA ---
+1. TITULO:
+   - Español obligatorio (ni una palabra en inglés)
+   - Sin acentos ni caracteres especiales
+   - Maximo 50 caracteres
+   - Sin puntos finales
+   - No usar "codigo", "archivo" o terminos vagos
 
-• PROHIBIDO:
-  - Acentos o caracteres especiales
-  - Descripciones vagas ("arreglar cosas")
-  - Mencionar "código" (error común)
-  - Exceder 50 caracteres en el título
+2. CUERPO:
+   - Verbos en infinitivo (añadir, corregir, implementar)
+   * Cada viñeta explica un cambio concreto
+   - Explicar QUE y POR QUE (no COMO)
+   - No mencionar nombres de archivos directamente
 
---- EJEMPLO PERFECTO ---
-fix: Corregir error de validacion en formulario
+3. PROHIBIDO:
+   - Terminos en inglés ("bug", "fix", "hotfix")
+   - Mensajes genericos ("actualizar cosas")
+   - Referencias a archivos sin contexto
+   - Mezclar tipos en un commit
 
-* El campo email no validaba dominios .com.co
-* Se añadió regex para validar formato correcto
-* Se mejoraron los mensajes de error
+--- EJEMPLO VALIDO ---
+feat: Agregar autenticacion con Google
+* Implementar flujo OAuth 2.0
+* Añadir validacion de tokens JWT
+* Crear endpoint /auth/google
+
+--- EJEMPLO INVALIDO ---
+fix: Solve login bug (ERROR: inglés)
+* Update auth.js (ERROR: menciona archivo)
+* Fix things (ERROR: genérico)
 
 --- CAMBIOS A DOCUMENTAR ---
 ${diff}
 
-Genera EXACTAMENTE 1 commit message siguiendo estas reglas.`;
+Genera EXACTAMENTE 1 commit que:
+1. Cumpla TODAS las reglas anteriores
+2. Sea ATOMICO (1 solo cambio logico)
+3. Use español perfectamente claro
+4. Priorice la claridad sobre la brevedad`;
 
   let attempts = 0;
   let title = "", body = "";
@@ -189,56 +208,62 @@ Genera EXACTAMENTE 1 commit message siguiendo estas reglas.`;
 };
 
 const generateListCommits = async (diff, numOptions = 3) => {
-  const prompt = `Genera EXACTAMENTE ${numOptions} opciones de mensajes de commit SEMÁNTICOS para estos cambios:
+const prompt = `Genera EXACTAMENTE ${numOptions} opciones de mensajes de commit SEMÁNTICOS en ESPAÑOL para estos cambios:
 
---- REGLAS ESTRICTAS ---
+--- REGLAS ESTRICTAS (ESPAÑOL OBLIGATORIO) ---
 1. TIPOS PERMITIDOS (SOLO ESTOS):
    • feat:     Nueva funcionalidad
    • fix:      Corrección de error
    • docs:     Cambios en documentación
-   • style:    Formato/estructura (sin código)
-   • refactor: Reestructuración (sin funcionalidad)
+   • style:    Formato/estructura (sin lógica)
+   • refactor: Reestructuración sin funcionalidad
    • perf:     Mejora de rendimiento
-   • test:     Pruebas automáticas
-   • chore:    Tareas de mantenimiento
+   • test:     Pruebas automatizadas
+   • chore:    Mantenimiento
    • build:    Dependencias/compilación
    • ci:       Integración continua
    • revert:   Revertir cambios
 
 2. ESTRUCTURA OBLIGATORIA:
-   <tipo>(<ámbito opcional>): <título en 50 caracteres>|||
-   * Viñeta 1 (cambio específico)
-   * Viñeta 2 (máx. 5 viñetas)
-   * Usar verbos en infinitivo
+   <tipo>(<ámbito>): <título (50 chars max)>|||
+   * Verbo en infinitivo (español)
+   * Descripción específica (todas las viñetas necesarias)
+   * Sin nombres de archivos sin contexto
+   * Cada viñeta explica un cambio concreto
 
-3. PROHIBIDO:
-   • Puntos finales en títulos
-   • Viñetas genéricas
-   • Mencionar archivos sin contexto
-   • Mezclar tipos en un commit
+3. PROHIBIDO ABSOLUTO:
+   • Títulos genéricos ("arreglar cosas")
+   • Términos en inglés ("bug", "fix", "hotfix")
+   • Viñetas que no empiecen con verbo
+   • Mezclar idiomas en descripciones
+   • Usar "código", "archivo" o términos vagos
 
---- EJEMPLO VÁLIDO ---
-feat(api): agregar endpoint de usuarios|||
-* Implementar POST /users
-* Validar campos requeridos
-* Incluir tests de integración
-
---- EJEMPLO INVÁLIDO ---
-fix: arreglar cosas|||
-* Corregir problemas
-* Actualizar archivos
+--- EJEMPLO PERFECTO ---
+feat(autenticacion): implementar login biometrico|||
+* Añadir soporte para huella digital en iOS
+* Integrar API de FaceID para Apple
+* Implementar autenticacion con rostro en Android
+* Crear componente reusable para validacion
+* Añadir tests E2E para flujo biometrico
+* Documentar metodos expuestos
 
 --- CAMBIOS A COMMITIR ---
 ${diff}
 
---- REQUERIMIENTO FINAL ---
+--- REQUISITOS FINALES ---
 Genera ${numOptions} opciones que:
-1. Cumplan TODAS las reglas anteriores
-2. Prioricen atomicidad (1 funcionalidad por commit)
-3. Usen ámbitos cuando apliquen
-4. Sean explícitas en los cambios reales
-5. Diferencien claramente tipo/título/cuerpo`;
+1. Usen español 100% (sin excepciones)
+2. Sean atomicas (1 funcionalidad/logica por commit)
+3. Incluyan todas las viñetas necesarias para explicar COMPLETAMENTE el cambio
+4. Usen ambitos cuando corresponda (ej: "(API)", "(UI)")
+5. Prioricen claridad sobre brevedad en el cuerpo
 
+--- BUENAS PRÁCTICAS ---
+• Ordenar viñetas por importancia
+• Agrupar cambios relacionados
+• Explicar el "qué" y "por qué" (no el "cómo")
+• Usar verbos fuertes: implementar, corregir, optimizar, eliminar
+• Incluir impactos relevantes (ej: "Aumenta rendimiento en 40%")`;
   const response = await callQwenAPI(prompt);
   return response.split('\n')
     .filter(opt => opt.includes('|||'))
