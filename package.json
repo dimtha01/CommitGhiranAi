@@ -1,0 +1,33 @@
+{
+  "name": "CommitGhiranAi",
+  "version": "2.1.1",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish:major": "npm version major && npm publish --access public",
+    "generate:branch": "echo 'Hola mundo'"
+
+  },
+  "bin": {
+    "CommitGhiranAi": "./index.js"
+  },
+  
+  "keywords": [
+    "ai",
+    "qwen",
+    "commit",
+    "gitmoji",
+    "conventional",
+    "commits"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "chatgpt": "^5.0.0",
+    "dotenv": "^16.0.3",
+    "inquirer": "^9.1.4"
+  }
+}
