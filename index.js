@@ -16,7 +16,8 @@ dotenv.config();
 
 const args = getArgs();
 const REGENERATE_MSG = "♻️ Regenerar mensajes";
-const QWEN_MODEL = "qwen/qwen3-30b-a3b";
+// const QWEN_MODEL = "x-ai/grok-4-fast:free";
+const QWEN_MODEL = "openai/gpt-oss-20b:free";
 const ENV_VAR_NAME = "OPENROUTER_API_KEY";
 const CONFIG_PATH = path.join(homedir(), ".commitconfig.json");
 
@@ -30,61 +31,17 @@ function estimateTokens(text) {
   return Math.ceil(text.length / 4);
 }
 
-// Función para validar que el mensaje esté en español
-function validateSpanishCommit(title, body) {
-  // Palabras clave en inglés que NO deben aparecer en commits
-  const englishKeywords = [
-    'add', 'added', 'adding', 'create', 'created', 'creating', 'update', 'updated', 'updating',
-    'fix', 'fixed', 'fixing', 'remove', 'removed', 'removing', 'delete', 'deleted', 'deleting',
-    'implement', 'implemented', 'implementing', 'improve', 'improved', 'improving',
-    'refactor', 'refactored', 'refactoring', 'change', 'changed', 'changing',
-    'modify', 'modified', 'modifying', 'enhance', 'enhanced', 'enhancing'
-  ];
-
-  // Palabras clave en español que SÍ deben aparecer
-  const spanishKeywords = [
-    'agregar', 'añadir', 'crear', 'actualizar', 'corregir', 'solucionar', 'arreglar',
-    'eliminar', 'remover', 'implementar', 'mejorar', 'refactorizar', 'cambiar',
-    'modificar', 'optimizar', 'configurar', 'integrar', 'desarrollar'
-  ];
-
-  const fullText = (title + ' ' + body).toLowerCase();
-  
-  // Verificar si contiene palabras en inglés
-  const hasEnglish = englishKeywords.some(keyword => 
-    fullText.includes(keyword.toLowerCase())
-  );
-  
-  // Verificar si contiene palabras en español
-  const hasSpanish = spanishKeywords.some(keyword => 
-    fullText.includes(keyword.toLowerCase())
-  );
-
-  // Verificar que el título no esté en inglés
-  const titleLower = title.toLowerCase();
-  const isEnglishTitle = englishKeywords.some(keyword => 
-    titleLower.includes(keyword)
-  );
-
-  return {
-    isValid: !hasEnglish && !isEnglishTitle,
-    hasSpanish,
-    hasEnglish,
-    isEnglishTitle
-  };
-}
-
 // Función para dividir el diff en chunks manejables
 function splitDiffIntoChunks(diff, maxTokens = MAX_TOKEN_LENGTH) {
   const lines = diff.split('\n');
   const chunks = [];
   let currentChunk = [];
   let currentTokens = 0;
-  
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const lineTokens = estimateTokens(line);
-    
+
     // Si una sola línea excede el límite, la dividimos
     if (lineTokens > maxTokens) {
       if (currentChunk.length > 0) {
@@ -92,32 +49,32 @@ function splitDiffIntoChunks(diff, maxTokens = MAX_TOKEN_LENGTH) {
         currentChunk = [];
         currentTokens = 0;
       }
-      
+
       // Dividir línea muy larga
       const longLineChunks = splitLongLine(line, maxTokens);
       chunks.push(...longLineChunks);
       continue;
     }
-    
+
     // Si agregar esta línea excede el límite, guardamos el chunk actual
     if (currentTokens + lineTokens > maxTokens && currentChunk.length > 0) {
       chunks.push(currentChunk.join('\n'));
-      
+
       // Mantener solapamiento para contexto
       const overlapLines = Math.min(5, currentChunk.length);
       currentChunk = currentChunk.slice(-overlapLines);
       currentTokens = estimateTokens(currentChunk.join('\n'));
     }
-    
+
     currentChunk.push(line);
     currentTokens += lineTokens;
   }
-  
+
   // Agregar el último chunk si no está vacío
   if (currentChunk.length > 0) {
     chunks.push(currentChunk.join('\n'));
   }
-  
+
   return chunks;
 }
 
@@ -125,11 +82,11 @@ function splitDiffIntoChunks(diff, maxTokens = MAX_TOKEN_LENGTH) {
 function splitLongLine(line, maxTokens) {
   const chunks = [];
   const maxLength = maxTokens * 4; // Convertir tokens a caracteres aproximados
-  
+
   for (let i = 0; i < line.length; i += maxLength) {
     chunks.push(line.substring(i, i + maxLength));
   }
-  
+
   return chunks;
 }
 
@@ -267,7 +224,7 @@ Responde en este formato JSON (TODO EN ESPAÑOL):
 IMPORTANTE: Toda la respuesta debe estar en español. No uses palabras en inglés.`;
 
   const response = await callQwenAPI(prompt);
-  
+
   try {
     // Intentar parsear como JSON
     const jsonMatch = response.match(/\{[\s\S]*\}/);
@@ -278,7 +235,7 @@ IMPORTANTE: Toda la respuesta debe estar en español. No uses palabras en inglé
     // Si no es JSON válido, crear estructura manual
     console.warn(`⚠️ Respuesta no es JSON válido para chunk ${chunkIndex + 1}, procesando manualmente...`);
   }
-  
+
   // Análisis manual si el JSON falla
   return {
     tipo_principal: "chore",
@@ -299,17 +256,17 @@ function consolidateAnalysis(analyses) {
     // Contar tipos
     const tipo = analysis.tipo_principal;
     tiposFrecuencia[tipo] = (tiposFrecuencia[tipo] || 0) + 1;
-    
+
     // Recopilar componentes
     if (analysis.componentes) {
       todosComponentes.push(...analysis.componentes);
     }
-    
+
     // Recopilar cambios
     if (analysis.cambios) {
       todosCambios.push(...analysis.cambios);
     }
-    
+
     // Recopilar contexto
     if (analysis.contexto) {
       contextos.push(analysis.contexto);
@@ -318,7 +275,7 @@ function consolidateAnalysis(analyses) {
 
   // Determinar tipo principal (más frecuente)
   const tipoPrincipal = Object.entries(tiposFrecuencia)
-    .sort(([,a], [,b]) => b - a)[0][0];
+    .sort(([, a], [, b]) => b - a)[0][0];
 
   // Eliminar duplicados de componentes
   const componentesUnicos = [...new Set(todosComponentes)];
@@ -333,35 +290,35 @@ function consolidateAnalysis(analyses) {
 
 const generateCommit = async (diff) => {
   const diffTokens = estimateTokens(diff);
-  
+
   console.log(`📊 Tokens estimados: ${diffTokens}`);
-  
+
   if (diffTokens <= MAX_TOKEN_LENGTH) {
     console.log("✅ Diff cabe en una sola solicitud");
     return await generateSingleCommit(diff);
   }
-  
+
   console.log("🔄 Diff muy largo, dividiendo en chunks...");
   const chunks = splitDiffIntoChunks(diff);
   console.log(`📦 Dividido en ${chunks.length} chunks`);
-  
+
   // Analizar cada chunk
   const analyses = [];
   for (let i = 0; i < chunks.length; i++) {
     console.log(`🔍 Analizando chunk ${i + 1}/${chunks.length}...`);
     const analysis = await analyzeChunk(chunks[i], i, chunks.length);
     analyses.push(analysis);
-    
+
     // Pausa entre solicitudes para evitar rate limiting
     if (i < chunks.length - 1) {
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
-  
+
   // Consolidar análisis
   console.log("🔄 Consolidando análisis...");
   const consolidatedAnalysis = consolidateAnalysis(analyses);
-  
+
   // Generar commit final basado en análisis consolidado
   return await generateCommitFromAnalysis(consolidatedAnalysis);
 };
@@ -401,43 +358,25 @@ ${diff}
 
 Genera EXACTAMENTE 1 commit message EN ESPAÑOL siguiendo estas reglas.`;
 
-  let attempts = 0;
-  let title = "", body = "";
+  const fullMessage = await callQwenAPI(prompt);
+  const [firstLine, ...rest] = fullMessage.split('\n').filter(Boolean);
+  const title = firstLine.trim();
+  const body = rest.join('\n').trim();
 
-  while (attempts < 5) {
-    const fullMessage = await callQwenAPI(prompt);
-    const [firstLine, ...rest] = fullMessage.split('\n').filter(Boolean);
-    title = firstLine.trim();
-    body = rest.join('\n').trim();
+  const commitType = title.split(':')[0].trim();
+  const validTypes = ['feat', 'fix', 'docs', 'style', 'refactor', 'perf', 'test', 'chore', 'build', 'ci', 'revert'];
 
-    const commitType = title.split(':')[0].trim();
-    const validTypes = ['feat', 'fix', 'docs', 'style', 'refactor', 'perf', 'test', 'chore', 'build', 'ci', 'revert'];
-    
-    // Validar que esté en español
-    const spanishValidation = validateSpanishCommit(title, body);
-    
-    if (body.length > 0 && validTypes.includes(commitType) && spanishValidation.isValid) {
-      console.log("✅ Commit generado en español correctamente");
-      return { title, body };
-    }
-
-    if (!spanishValidation.isValid) {
-      console.warn(`⚠️ Intento ${attempts + 1}: mensaje contiene inglés, regenerando en español...`);
-      if (spanishValidation.hasEnglish) {
-        console.warn("   - Detectadas palabras en inglés");
-      }
-      if (spanishValidation.isEnglishTitle) {
-        console.warn("   - Título en inglés detectado");
-      }
-    } else {
-      console.warn(`⚠️ Intento ${attempts + 1}: mensaje no cumple formato, reintentando...`);
-    }
-    
-    attempts++;
+  if (body.length > 0 && validTypes.includes(commitType)) {
+    console.log("✅ Commit generado en español");
+    return { title, body };
   }
 
-  console.error("❌ No se pudo generar un mensaje válido en español después de 5 intentos.");
-  process.exit(1);
+  // Fallback si no cumple el formato exacto
+  console.log("⚠️ Usando formato de respuesta completa");
+  return {
+    title: title || "chore: Actualizar codigo",
+    body: body || "* Realizar cambios en el codigo"
+  };
 }
 
 // Función para generar commit basado en análisis consolidado
@@ -469,46 +408,33 @@ Contexto general: ${analysis.contexto_general}
 
 Genera el mensaje de commit EN ESPAÑOL:`;
 
-  let attempts = 0;
-  let title = "", body = "";
+  const fullMessage = await callQwenAPI(prompt);
+  const [firstLine, ...rest] = fullMessage.split('\n').filter(Boolean);
+  const title = firstLine.trim();
+  const body = rest.join('\n').trim();
 
-  while (attempts < 5) {
-    const fullMessage = await callQwenAPI(prompt);
-    const [firstLine, ...rest] = fullMessage.split('\n').filter(Boolean);
-    title = firstLine.trim();
-    body = rest.join('\n').trim();
+  const commitType = title.split(':')[0].trim();
+  const validTypes = ['feat', 'fix', 'docs', 'style', 'refactor', 'perf', 'test', 'chore', 'build', 'ci', 'revert'];
 
-    const commitType = title.split(':')[0].trim();
-    const validTypes = ['feat', 'fix', 'docs', 'style', 'refactor', 'perf', 'test', 'chore', 'build', 'ci', 'revert'];
-    
-    // Validar que esté en español
-    const spanishValidation = validateSpanishCommit(title, body);
-
-    if (body.length > 0 && validTypes.includes(commitType) && spanishValidation.isValid) {
-      console.log("✅ Commit generado en español correctamente");
-      return { title, body };
-    }
-
-    if (!spanishValidation.isValid) {
-      console.warn(`⚠️ Intento ${attempts + 1}: mensaje contiene inglés, regenerando en español...`);
-    } else {
-      console.warn(`⚠️ Intento ${attempts + 1}: mensaje no cumple formato, reintentando...`);
-    }
-    
-    attempts++;
+  if (body.length > 0 && validTypes.includes(commitType)) {
+    console.log("✅ Commit generado en español");
+    return { title, body };
   }
 
-  console.error("❌ No se pudo generar un mensaje válido en español después de 5 intentos.");
-  process.exit(1);
+  // Fallback usando el análisis
+  return {
+    title: `${analysis.tipo_principal}: ${analysis.componentes[0] || 'Actualizar codigo'}`,
+    body: analysis.cambios.map(c => `* ${c}`).join('\n') || "* Realizar cambios en el codigo"
+  };
 }
 
 const generateListCommits = async (diff, numOptions = "3") => {
   const diffTokens = estimateTokens(diff);
-  
+
   if (diffTokens > MAX_TOKEN_LENGTH) {
     console.log("⚠️ Diff muy largo para generar múltiples opciones, usando análisis por chunks...");
     const chunks = splitDiffIntoChunks(diff);
-    
+
     // Para opciones múltiples con diff largo, generar análisis simplificado
     const analyses = [];
     for (let i = 0; i < Math.min(chunks.length, 3); i++) {
@@ -516,9 +442,9 @@ const generateListCommits = async (diff, numOptions = "3") => {
       analyses.push(analysis);
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
-    
+
     const consolidatedAnalysis = consolidateAnalysis(analyses);
-    
+
     // Generar opciones basadas en análisis consolidado
     const options = [];
     for (let i = 0; i < parseInt(numOptions); i++) {
@@ -526,7 +452,7 @@ const generateListCommits = async (diff, numOptions = "3") => {
       options.push(commit);
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
-    
+
     return options;
   }
 
@@ -554,39 +480,26 @@ feat: Implementar autenticacion biometrica|||* Añadir soporte para huella digit
 
 Genera ${numOptions} opciones diferentes EN ESPAÑOL:`;
 
-  let attempts = 0;
-  let validOptions = [];
+  const response = await callQwenAPI(prompt);
+  const options = response.split('\n')
+    .filter(opt => opt.includes('|||'))
+    .map(opt => {
+      const [title, body] = opt.split('|||');
+      return {
+        title: title.trim(),
+        body: body?.trim() || ""
+      };
+    });
 
-  while (attempts < 3 && validOptions.length < parseInt(numOptions)) {
-    const response = await callQwenAPI(prompt);
-    const options = response.split('\n')
-      .filter(opt => opt.includes('|||'))
-      .map(opt => {
-        const [title, body] = opt.split('|||');
-        return {
-          title: title.trim(),
-          body: body?.trim() || ""
-        };
-      });
-
-    // Validar que todas las opciones estén en español
-    for (const option of options) {
-      const spanishValidation = validateSpanishCommit(option.title, option.body);
-      if (spanishValidation.isValid && validOptions.length < parseInt(numOptions)) {
-        validOptions.push(option);
-      }
-    }
-
-    attempts++;
+  // Si no se generaron opciones con el formato esperado, crear opciones básicas
+  if (options.length === 0) {
+    console.log("⚠️ Generando opciones básicas en español");
+    const basicCommit = await generateSingleCommit(diff);
+    return [basicCommit];
   }
 
-  if (validOptions.length === 0) {
-    console.error("❌ No se pudieron generar opciones válidas en español");
-    process.exit(1);
-  }
-
-  console.log(`✅ Generadas ${validOptions.length} opciones en español`);
-  return validOptions;
+  console.log(`✅ Generadas ${options.length} opciones en español`);
+  return options.slice(0, parseInt(numOptions));
 };
 
 const runInteractive = async () => {

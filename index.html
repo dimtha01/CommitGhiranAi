@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preguntas Frecuentes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+  <div class="max-w-6xl w-full">
+    <div class="bg-white rounded-3xl shadow-lg p-8 md:p-12">
+      <div class="grid md:grid-cols-2 gap-12 items-start">
+        <!-- Left Column -->
+        <div class="space-y-6">
+          <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+            Preguntas<br>
+            Frecuentes
+          </h1>
+          <p class="text-gray-600 text-lg leading-relaxed">
+            Todas las respuestas a tus preguntas sobre nuestros cursos, precios,
+            métodos de aprendizaje y más.
+          </p>
+          <button
+            class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 transition-colors">
+            Contáctanos
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Right Column - FAQ Items -->
+        <div class="space-y-4">
+          <div class="faq-item bg-gray-50 rounded-2xl overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-6 flex items-center justify-between hover:bg-gray-100 transition-colors">
+              <span class="font-medium text-gray-900">¿En qué formato se ofrecen los cursos?</span>
+              <svg class="faq-icon w-6 h-6 text-gray-400 transition-transform" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                </path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden px-6 pb-6">
+              <p class="text-gray-600">Nuestros cursos se ofrecen en formato online con videos HD, materiales
+                descargables y acceso 24/7 desde cualquier dispositivo.</p>
+            </div>
+          </div>
+
+          <div class="faq-item bg-gray-50 rounded-2xl overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-6 flex items-center justify-between hover:bg-gray-100 transition-colors">
+              <span class="font-medium text-gray-900">¿Cómo me inscribo a un curso?</span>
+              <svg class="faq-icon w-6 h-6 text-gray-400 transition-transform" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                </path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden px-6 pb-6">
+              <p class="text-gray-600">Puedes inscribirte directamente desde nuestra plataforma, selecciona el curso de
+                tu interés y completa el proceso de pago seguro.</p>
+            </div>
+          </div>
+
+          <div class="faq-item bg-gray-50 rounded-2xl overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-6 flex items-center justify-between hover:bg-gray-100 transition-colors">
+              <span class="font-medium text-gray-900">¿Recibiré un certificado al finalizar el curso?</span>
+              <svg class="faq-icon w-6 h-6 text-gray-400 transition-transform" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                </path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden px-6 pb-6">
+              <p class="text-gray-600">Sí, al completar exitosamente el curso recibirás un certificado digital
+                verificable que puedes compartir en LinkedIn y tu CV.</p>
+            </div>
+          </div>
+
+          <div class="faq-item bg-gray-50 rounded-2xl overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-6 flex items-center justify-between hover:bg-gray-100 transition-colors">
+              <span class="font-medium text-gray-900">¿Ofrecen planes de pago o cuotas?</span>
+              <svg class="faq-icon w-6 h-6 text-gray-400 transition-transform" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                </path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden px-6 pb-6">
+              <p class="text-gray-600">Sí, ofrecemos planes de pago flexibles en 3, 6 y 12 cuotas sin interés para que
+                puedas acceder a nuestros cursos fácilmente.</p>
+            </div>
+          </div>
+
+          <div class="faq-item bg-gray-50 rounded-2xl overflow-hidden">
+            <button
+              class="faq-question w-full text-left p-6 flex items-center justify-between hover:bg-gray-100 transition-colors">
+              <span class="font-medium text-gray-900">¿Cuánto tiempo toma completar un curso?</span>
+              <svg class="faq-icon w-6 h-6 text-gray-400 transition-transform" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                </path>
+              </svg>
+            </button>
+            <div class="faq-answer hidden px-6 pb-6">
+              <p class="text-gray-600">El tiempo varía según el curso, pero en promedio puedes completar uno en 4-8
+                semanas dedicando 2-3 horas por semana a tu ritmo.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const faqItems = document.querySelectorAll('.faq-item');
+
+      faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
+        const icon = item.querySelector('.faq-icon');
+
+        question.addEventListener('click', function () {
+          const isOpen = !answer.classList.contains('hidden');
+
+          // Close all other FAQ items
+          faqItems.forEach(otherItem => {
+            if (otherItem !== item) {
+              otherItem.querySelector('.faq-answer').classList.add('hidden');
+              otherItem.querySelector('.faq-icon').style.transform = 'rotate(0deg)';
+            }
+          });
+
+          // Toggle current item
+          if (isOpen) {
+            answer.classList.add('hidden');
+            icon.style.transform = 'rotate(0deg)';
+          } else {
+            answer.classList.remove('hidden');
+            icon.style.transform = 'rotate(45deg)';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
