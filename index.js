@@ -16,7 +16,7 @@ dotenv.config();
 
 const args = getArgs();
 const REGENERATE_MSG = "♻️ Regenerar mensajes";
-const QWEN_MODEL = "qwen/qwen3-30b-a3b";
+const QWEN_MODEL = "openai/gpt-oss-20b:free";
 const ENV_VAR_NAME = "OPENROUTER_API_KEY";
 const CONFIG_PATH = path.join(homedir(), ".commitconfig.json");
 
